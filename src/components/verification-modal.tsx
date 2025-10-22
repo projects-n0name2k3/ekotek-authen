@@ -45,7 +45,8 @@ interface UploadedPart {
 }
 
 interface VerificationResult {
-  accuracy: number;
+  predicted_label?: "Real" | "Fake";
+  confidence: number;
   classification: "confident" | "borderline" | "fake";
 }
 
@@ -177,7 +178,7 @@ export function VerificationModal({
       const formData = new FormData();
       formData.append("file", materialPart.file);
 
-      const resp = await fetch("http://localhost:8000/predict", {
+      const resp = await fetch("https://fdet.ntq.ai/predict", {
         method: "POST",
         body: formData,
       });
@@ -190,21 +191,29 @@ export function VerificationModal({
       }
 
       const data: {
-        accuracy: number;
+        predicted_label: "Real" | "Fake";
+        confidence: number;
       } = await resp.json();
 
       // Nếu backend trả đúng shape, dùng luôn; nếu không, chuyển sang fallback logic
       let classification: "confident" | "borderline" | "fake";
-      if (data.accuracy >= 90) {
-        classification = "confident";
-      } else if (data.accuracy >= 70) {
-        classification = "borderline";
+      if (data.predicted_label === "Real") {
+        if (data.confidence >= 0.9) {
+          classification = "confident";
+        } else if (data.confidence >= 0.7) {
+          classification = "borderline";
+        } else {
+          classification = "fake";
+        }
       } else {
         classification = "fake";
       }
 
       setResult({
-        accuracy: data.accuracy,
+        confidence:
+          data.predicted_label === "Real"
+            ? data.confidence
+            : 1 - data.confidence,
         classification,
       });
     } catch (err) {
@@ -463,7 +472,7 @@ export function VerificationModal({
                 <div className="space-y-4 text-center">
                   <div>
                     <h3 className="mb-2 text-3xl font-bold">
-                      {result.accuracy}%
+                      {result.confidence * 100}%
                     </h3>
                     <p className="text-lg font-medium">
                       {result.classification === "confident" &&
