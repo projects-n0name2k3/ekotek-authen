@@ -463,7 +463,7 @@ export function VerificationModal({
                 <div className="space-y-4 text-center">
                   <div>
                     <h3 className="mb-2 text-3xl font-bold">
-                      {result.accuracy * 100}%
+                      {result.accuracy}%
                     </h3>
                     <p className="text-lg font-medium">
                       {result.classification === "confident" &&
