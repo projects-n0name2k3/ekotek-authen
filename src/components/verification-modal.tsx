@@ -170,7 +170,7 @@ export function VerificationModal({
 
     const interval = setInterval(() => {
       setProgress((prev) => Math.min(prev + 10, 98));
-    }, 200);
+    }, 500);
 
     try {
       if (!materialPart) {
