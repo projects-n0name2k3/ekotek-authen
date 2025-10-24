@@ -198,7 +198,7 @@ export function VerificationModal({
 
           // Nếu là Real thì lấy confidence, nếu là Fake thì lấy 1 - confidence
           if (data.predicted_label.toLowerCase() === "real") {
-            materialAccuracy = Math.round(data.confidence * 100) + 0.05;
+            materialAccuracy = Math.round((data.confidence + 0.07) * 100);
           } else {
             materialAccuracy = Math.round((1 - data.confidence) * 100);
           }
